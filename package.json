@@ -1,0 +1,75 @@
+{
+  "name": "@periodic/osmium",
+  "version": "1.0.0",
+  "description": "Production-grade Redis caching middleware for Express with tag-based invalidation, auto-caching, and cluster support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
+  },
+  "keywords": [
+    "express",
+    "cache",
+    "middleware",
+    "redis",
+    "ioredis",
+    "caching",
+    "performance",
+    "nodejs",
+    "typescript",
+    "cluster",
+    "invalidation",
+    "tag-based-cache",
+    "http-cache",
+    "api-cache",
+    "rate-limiting",
+    "periodic"
+  ],
+  "author": "Uday Thakur <udaythakurwork@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/udaythakur7469/periodic-osmium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/udaythakur7469/periodic-osmium/issues"
+  },
+  "homepage": "https://github.com/udaythakur7469/periodic-osmium#readme",
+  "dependencies": {
+    "ioredis": "^5.3.2"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.1",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
