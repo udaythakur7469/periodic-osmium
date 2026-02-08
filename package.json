@@ -1,6 +1,6 @@
 {
   "name": "@periodic/osmium",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-grade Redis caching middleware for Express with tag-based invalidation, auto-caching, and cluster support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
