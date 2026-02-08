@@ -1,6 +1,6 @@
 # 🧪 Periodic Osmium
 
-[![npm version](https://img.shields.io/npm/v/periodic-osmium.svg)](https://www.npmjs.com/package/periodic-osmium)
+[![npm version](https://img.shields.io/npm/v/periodic-osmium.svg)](https://www.npmjs.com/package/@periodic/osmium)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
