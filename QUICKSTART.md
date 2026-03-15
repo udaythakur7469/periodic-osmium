@@ -7,7 +7,7 @@ Get up and running with Periodic Osmium in 5 minutes!
 ## 📦 Installation
 
 ```bash
-npm install periodic-osmium ioredis
+npm install @periodic/osmium ioredis
 ```
 
 ---
@@ -18,7 +18,7 @@ npm install periodic-osmium ioredis
 
 ```typescript
 import express from 'express';
-import { createRedisClient, cacheMiddleware } from 'periodic-osmium';
+import { createRedisClient, cacheMiddleware } from '@periodic/osmium';
 
 const app = express();
 const redis = createRedisClient({

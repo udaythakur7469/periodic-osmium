@@ -28,13 +28,13 @@ Part of the **Periodic** series of Node.js middleware packages by Uday Thakur.
 ## 📦 Installation
 
 ```bash
-npm install periodic-osmium ioredis
+npm install @periodic/osmium ioredis
 ```
 
 Or with yarn:
 
 ```bash
-yarn add periodic-osmium ioredis
+yarn add @periodic/osmium ioredis
 ```
 
 ---
@@ -43,7 +43,7 @@ yarn add periodic-osmium ioredis
 
 ```typescript
 import express from 'express';
-import { createRedisClient, cacheMiddleware } from 'periodic-osmium';
+import { createRedisClient, cacheMiddleware } from '@periodic/osmium';
 
 const app = express();
 
@@ -331,7 +331,7 @@ await req.cache.healthCheck(): Promise<boolean>
 
 ```typescript
 import express from 'express';
-import { createRedisClient, cacheMiddleware } from 'periodic-osmium';
+import { createRedisClient, cacheMiddleware } from '@periodic/osmium';
 
 const app = express();
 const redis = createRedisClient({ host: 'localhost', port: 6379 });

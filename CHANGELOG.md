@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-02-08
 
 ### Added
-- Initial release of periodic-osmium
+- Initial release of @periodic/osmium
 - Auto-caching for GET requests
 - Tag-based cache invalidation
 - Pattern-based cache clearing
