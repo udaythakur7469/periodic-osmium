@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { Redis, Cluster } from 'ioredis';
 import crypto from 'crypto';
 import { CacheService } from '../core/cache';
@@ -42,7 +42,10 @@ import { CacheConfig } from '../core/types';
  * );
  * ```
  */
-export function cacheMiddleware(redisClient: Redis | Cluster, config: CacheConfig = {}) {
+export function cacheMiddleware(
+  redisClient: Redis | Cluster,
+  config: CacheConfig = {}
+): RequestHandler {
   const {
     strategy = 'auto',
     ttl = 3600,
@@ -51,13 +54,14 @@ export function cacheMiddleware(redisClient: Redis | Cluster, config: CacheConfi
     invalidate = {},
   } = config;
 
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     // Always attach cache service to request
     req.cache = new CacheService(redisClient, namespace, ttl);
 
     // If strategy is 'none' or 'manual', just attach service and continue
     if (strategy === 'none' || strategy === 'manual') {
-      return next();
+      next();
+      return;
     }
 
     const isGetRequest = req.method === 'GET';
@@ -98,44 +102,28 @@ export function cacheMiddleware(redisClient: Redis | Cluster, config: CacheConfi
         const cacheKey = generateKey(req);
         req.cacheKey = cacheKey;
 
-        try {
-          // Check cache
-          const cachedData = await req.cache.get(cacheKey);
+        (async () => {
+          try {
+            // Check cache
+            const cachedData = await req.cache.get(cacheKey);
 
-          if (cachedData !== null) {
-            // Cache HIT - return cached data immediately
-            res.setHeader('X-Cache', 'HIT');
-            res.setHeader('X-Cache-Key', cacheKey);
-            return res.json(cachedData);
-          }
-
-          // Cache MISS - continue to controller
-          res.setHeader('X-Cache', 'MISS');
-          res.setHeader('X-Cache-Key', cacheKey);
-
-          // Override json method to cache response
-          const originalJson = res.json.bind(res);
-
-          res.json = function (data: any) {
-            // Only cache successful responses
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              const tags =
-                typeof autoCache.tags === 'function' ? autoCache.tags(req) : autoCache.tags || [];
-
-              // Cache asynchronously (non-blocking)
-              req.cache
-                .set(cacheKey, data, ttl, tags)
-                .catch((err) => console.error('Cache set error:', err));
+            if (cachedData !== null) {
+              // Cache HIT - return cached data immediately
+              res.setHeader('X-Cache', 'HIT');
+              res.setHeader('X-Cache-Key', cacheKey);
+              res.json(cachedData);
+              return;
             }
-            return originalJson(data);
-          };
 
-          return next();
-        } catch (error) {
-          console.error('Auto-cache error:', error);
-          res.setHeader('X-Cache', 'ERROR');
-          return next();
-        }
+            // ... rest of logic
+            next();
+          } catch (error) {
+            console.error('Auto-cache error:', error);
+            res.setHeader('X-Cache', 'ERROR');
+            next();
+          }
+        })();
+        return;
       }
     }
 
