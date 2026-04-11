@@ -9,12 +9,9 @@ describe('CacheService', () => {
   let redis: any;
   let cache: CacheService;
 
-  beforeAll(() => {
-    redis = createRedisClient({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-    });
-  });
+  redis = createRedisClient({
+  url: process.env.REDIS_URL,
+});
 
   beforeEach(() => {
     cache = new CacheService(redis, 'test', 60);
