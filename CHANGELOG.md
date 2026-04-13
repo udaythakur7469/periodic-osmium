@@ -16,6 +16,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cache versioning support
 - GraphQL adapter
 
+## [1.0.5] - 2026-04-13
+
+### Fixed
+- **Critical: Cache MISS handler restored**: The async IIFE refactor introduced in v1.0.3
+  accidentally dropped the cache MISS branch when restructuring the middleware signature —
+  the `res.json` override and `req.cache.set` call were never carried over, causing all GET
+  requests to fall through to the controller without storing anything in Redis or setting
+  `X-Cache`/`X-Cache-Key` headers on MISS responses
+  - Restored `res.json` override on MISS to intercept controller responses and persist them to Redis
+  - Restored `X-Cache: MISS` and `X-Cache-Key` response headers on cache miss
+  - `X-Cache: HIT` path was unaffected and continues to work as before
+  - Retained the `RequestHandler` return type annotation introduced in v1.0.3
+  - Retained the `createStandaloneRedisClient` export added in v1.0.4
+
+### Technical Details
+- Root cause: during the v1.0.3 refactor from `async` middleware to sync + IIFE, the HIT
+  branch was correctly ported but the MISS branch — the `res.json` override and the
+  `req.cache.set` call — was left out during the rewrite and went unnoticed because HIT
+  paths in existing tests continued to pass
+- Fix restores the `async` middleware signature alongside the explicit `RequestHandler`
+  return type, which satisfies both Express runtime behaviour and TypeScript typing
+- No changes to `cache.ts`, `redis.ts`, `types.ts`, or `index.ts` — `express.ts` only
+
+### Migration Guide
+No code changes required. Simply update the package:
+```bash
+npm install @periodic/osmium@1.0.5
+```
+After updating, cached GET routes will correctly return `X-Cache: MISS` on first request
+and `X-Cache: HIT` with significantly faster response times on subsequent requests within TTL.
+
 ## [1.0.4] - 2025-02-08
  
 ### Added

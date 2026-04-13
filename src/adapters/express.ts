@@ -54,14 +54,13 @@ export function cacheMiddleware(
     invalidate = {},
   } = config;
 
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     // Always attach cache service to request
     req.cache = new CacheService(redisClient, namespace, ttl);
 
     // If strategy is 'none' or 'manual', just attach service and continue
     if (strategy === 'none' || strategy === 'manual') {
-      next();
-      return;
+      return next();
     }
 
     const isGetRequest = req.method === 'GET';
@@ -102,28 +101,44 @@ export function cacheMiddleware(
         const cacheKey = generateKey(req);
         req.cacheKey = cacheKey;
 
-        (async () => {
-          try {
-            // Check cache
-            const cachedData = await req.cache.get(cacheKey);
+        try {
+          // Check cache
+          const cachedData = await req.cache.get(cacheKey);
 
-            if (cachedData !== null) {
-              // Cache HIT - return cached data immediately
-              res.setHeader('X-Cache', 'HIT');
-              res.setHeader('X-Cache-Key', cacheKey);
-              res.json(cachedData);
-              return;
-            }
-
-            // ... rest of logic
-            next();
-          } catch (error) {
-            console.error('Auto-cache error:', error);
-            res.setHeader('X-Cache', 'ERROR');
-            next();
+          if (cachedData !== null) {
+            // Cache HIT - return cached data immediately
+            res.setHeader('X-Cache', 'HIT');
+            res.setHeader('X-Cache-Key', cacheKey);
+            return res.json(cachedData);
           }
-        })();
-        return;
+
+          // Cache MISS - continue to controller
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('X-Cache-Key', cacheKey);
+
+          // Override json method to cache response
+          const originalJson = res.json.bind(res);
+
+          res.json = function (data: any) {
+            // Only cache successful responses
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              const tags =
+                typeof autoCache.tags === 'function' ? autoCache.tags(req) : autoCache.tags || [];
+
+              // Cache asynchronously (non-blocking)
+              req.cache
+                .set(cacheKey, data, ttl, tags)
+                .catch((err) => console.error('Cache set error:', err));
+            }
+            return originalJson(data);
+          };
+
+          return next();
+        } catch (error) {
+          console.error('Auto-cache error:', error);
+          res.setHeader('X-Cache', 'ERROR');
+          return next();
+        }
       }
     }
 

@@ -9,9 +9,11 @@ describe('CacheService', () => {
   let redis: any;
   let cache: CacheService;
 
-  redis = createRedisClient({
-  url: process.env.REDIS_URL,
-});
+  beforeAll(() => {
+    redis = createRedisClient({
+      url: process.env.REDIS_URL,
+    });
+  });
 
   beforeEach(() => {
     cache = new CacheService(redis, 'test', 60);
