@@ -16,7 +16,7 @@
 
 // Core exports
 export { CacheService } from './core/cache';
-export { createRedisClient, checkRedisHealth } from './core/redis';
+export { createRedisClient, createStandaloneRedisClient, checkRedisHealth } from './core/redis';
 
 // Adapter exports
 export { cacheMiddleware } from './adapters/express';

@@ -16,6 +16,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cache versioning support
 - GraphQL adapter
 
+## [1.0.4] - 2025-02-08
+ 
+### Added
+- **TypeScript Function Overloads**: `createRedisClient()` now has function overloads that provide precise type inference
+  - When `clusterNodes` and `isProduction: true` are provided → returns `Cluster` type
+  - When neither are provided → returns `Redis` type
+  - Eliminates TypeScript error: `"Type 'Redis | Cluster' is not assignable to type 'Redis'"`
+- **New Function**: `createStandaloneRedisClient()` for guaranteed `Redis` type
+  - Provides explicit type safety for non-cluster use cases
+  - Accepts same configuration as `createRedisClient` minus cluster-specific options
+  - Returns strictly `Redis` type, never `Cluster`
+ 
+### Changed
+- Added `ClusterConfig` and `StandaloneConfig` type definitions for better type narrowing
+- Updated exports to include `createStandaloneRedisClient` function
+ 
+### Technical Details
+- Function overloads enable TypeScript to infer the correct return type based on configuration
+- `createStandaloneRedisClient` uses `Omit<RedisConfig, 'clusterNodes' | 'isProduction'>` to prevent cluster configuration
+- No runtime behavior changes - purely type-level improvements
+- Maintains full backward compatibility with existing code
+- Improves IDE autocomplete and type checking experience
+ 
+### Migration Guide
+No code changes required for existing usage! The improvements are automatic:
+ 
+```typescript
+// Before v1.0.4: Type was Redis | Cluster
+// After v1.0.4: Type is correctly inferred as Redis
+const redis = createRedisClient({ host: 'localhost' });
+ 
+// New in v1.0.4: Guaranteed Redis type
+const standalone = createStandaloneRedisClient({ host: 'localhost' });
+ 
+// Cluster type correctly inferred
+const cluster = createRedisClient({
+  clusterNodes: ['node1:6379'],
+  isProduction: true
+});
+```
+
 ## [1.0.3] - 2025-02-08
 
 ### Fixed
